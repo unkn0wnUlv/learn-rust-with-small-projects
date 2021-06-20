@@ -34,10 +34,15 @@ fn parse_markdown_file(filename: &str) {
     // Read the file line-by-line
     let reader = BufReader::new(file);
 
+    // Read line by line
     for line in reader.lines() {
+
+        // Take the first char of a line
         let line_contents = line.unwrap();
         let mut first_char: Vec<char> = line_contents.chars().take(1).collect();
+        
         let mut output_line = String::new();
+
         match first_char.pop() {
             Some('#') => {
                 if _ptag {
@@ -97,4 +102,6 @@ fn parse_markdown_file(filename: &str) {
 
 fn usage() {
     println!("---usage---");
+    println!("Run the program with an argument that corresponds to the file you want to compile");
+    println!("Example: ./tinymd test.md");
 }
