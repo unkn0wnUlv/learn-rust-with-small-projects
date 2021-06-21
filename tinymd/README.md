@@ -4,6 +4,3 @@ This is a very simple markdown compiler built with the help of jesse Lawson at h
 
 It can only convert titles and simple paragraphs!
 
-Possible future TODOS:
-https://www.joshmcguigan.com/blog/build-your-own-shell-rust/
-https://limpet.net/mbrubeck/2014/08/08/toy-layout-engine-1.html
