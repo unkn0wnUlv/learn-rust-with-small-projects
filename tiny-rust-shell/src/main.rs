@@ -1,7 +1,8 @@
 use std::io::{self,Write};
 use std::str::FromStr;
+mod commands; 
+mod utils;
 
-static DEBUG: bool = false;
 
 #[cfg(test)]
 mod unittest_tokenize_command {
@@ -45,8 +46,19 @@ struct Command {
     args: Vec<String>,
 }
 
+// TODO:
+// cat
+// cd 
+// cp
+// env
+// grep
+// ls
+// mv
+// rm
 enum Builtin {
     Echo,
+    Exit,
+    Cat,
 }
 
 impl FromStr for Builtin {
@@ -54,21 +66,19 @@ impl FromStr for Builtin {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "echo" => Ok(Builtin::Echo),
+            "exit" => Ok(Builtin::Exit),
+            "cat" => Ok(Builtin::Cat),
             _ => Err(()),
         }
     }
 }
 
-// Implementation of echo
-fn builtin_echo(args : &Vec<String>) -> i32 {
-    println!("{}", args.join(" "));
-    0
-}
-
 // Process the command, checking if it is an available built in
 fn process_command(c : Command) -> i32 {
     match Builtin::from_str(&c.keyword) {
-        Ok(Builtin::Echo) => builtin_echo(&c.args),
+        Ok(Builtin::Echo) => commands::builtin_echo(&c.args),
+        Ok(Builtin::Exit) => commands::builtin_exit(),
+        Ok(Builtin::Cat) => commands::builtin_cat(&c.args),
         _ => {
             println!("{}: command not yet implemented", &c.keyword);
             1
@@ -78,7 +88,7 @@ fn process_command(c : Command) -> i32 {
 
 fn print_prompt() {
     let prompt_char = "-~>";
-    print!("{0} ", prompt_char);
+    print!("\n{0} ", prompt_char);
     io::stdout().flush().unwrap();
 }
 
@@ -87,9 +97,7 @@ fn read_command() -> String {
     io::stdin().read_line(&mut command)
         .expect("Failed to read command");
 
-    if DEBUG {
-        println!("DEBUG: {:?}", command);
-    }
+    utils::debug(format!("{:?}", command));
 
     command
 }
@@ -97,9 +105,7 @@ fn read_command() -> String {
 fn tokenize_command(c: String) -> Command {
     let mut command_split : Vec<String> = c.split_whitespace().map(|s| s.to_string()).collect();
 
-    if DEBUG {
-        println!("DEBUG: Split input {:?}", command_split);
-    }
+    utils::debug(format!("Split input {:?}", command_split));
 
     let command = Command {
         keyword : command_split.remove(0),
